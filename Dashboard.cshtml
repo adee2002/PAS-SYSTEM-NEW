@@ -1,0 +1,131 @@
+﻿@model ProjectApprovalSystem.Models.ViewModels.StudentDashboardViewModel
+
+@{
+    ViewData["Title"] = "Student Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>My Dashboard</h1>
+                <a asp-action="CreateProposal" class="btn btn-primary">+ New Project Proposal</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Proposals</h5>
+                    <h2 class="display-4">@Model.TotalProjectsSubmitted</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Active Proposals</h5>
+                    <h2 class="display-4">@Model.ActiveProjects</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Matched Projects</h5>
+                    <h2 class="display-4">@Model.MatchedProjects</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Proposals Table -->
+    <div class="card">
+        <div class="card-header">
+            <h3>My Project Proposals</h3>
+        </div>
+        <div class="card-body">
+            @if (!Model.MyProjects.Any())
+            {
+                <div class="alert alert-info">
+                    You haven't submitted any project proposals yet.
+                    <a asp-action="CreateProposal">Create your first proposal</a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Research Area</th>
+                                <th>Status</th>
+                                <th>Submitted Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var project in Model.MyProjects)
+                            {
+                                <tr>
+                                    <td>@project.Title</td>
+                                    <td>@project.ResearchAreaName</td>
+                                    <td>
+                                        @if (project.Status == "Pending")
+                                        {
+                                            <span class="badge bg-warning">Pending</span>
+                                        }
+                                        else if (project.Status == "UnderReview")
+                                        {
+                                            <span class="badge bg-info">Under Review</span>
+                                        }
+                                        else if (project.Status == "Matched")
+                                        {
+                                            <span class="badge bg-success">Matched</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@project.Status</span>
+                                        }
+                                    </td>
+                                    <td>@project.SubmittedDate.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        @if (project.CanEdit)
+                                        {
+                                            <a asp-action="EditProposal" asp-route-id="@project.Id" class="btn btn-sm btn-primary">Edit</a>
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="withdrawProposal(@project.Id)">Withdraw</button>
+                                        }
+                                        @if (project.Status == "Matched" && project.IsIdentityRevealed)
+                                        {
+                                            <a asp-action="MatchDetails" asp-route-id="@project.Id" class="btn btn-sm btn-info">View Supervisor</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function withdrawProposal(projectId) {
+            if (confirm('Are you sure you want to withdraw this proposal? This action cannot be undone.')) {
+                $.post('/Student/WithdrawProposal', { id: projectId })
+                    .done(function() {
+                        location.reload();
+                    })
+                    .fail(function() {
+                        alert('Error withdrawing proposal.');
+                    });
+            }
+        }
+    </script>
+}

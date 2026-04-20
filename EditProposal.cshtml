@@ -1,0 +1,65 @@
+﻿@model ProjectApprovalSystem.Models.ViewModels.CreateProjectViewModel
+
+@{
+    ViewData["Title"] = "Edit Project Proposal";
+    var projectId = ViewBag.ProjectId;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">Edit Project Proposal</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditProposal" asp-route-id="@projectId" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Abstract" class="form-label"></label>
+                            <textarea asp-for="Abstract" class="form-control" rows="6"></textarea>
+                            <span asp-validation-for="Abstract" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TechnicalStack" class="form-label"></label>
+                            <input asp-for="TechnicalStack" class="form-control" />
+                            <span asp-validation-for="TechnicalStack" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResearchAreaId" class="form-label"></label>
+                            <select asp-for="ResearchAreaId" asp-items="Model.ResearchAreas" class="form-select">
+                                <option value="">-- Select Research Area --</option>
+                            </select>
+                            <span asp-validation-for="ResearchAreaId" class="text-danger"></span>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <strong>Note:</strong> You can only edit proposals that are still in "Pending" status.
+                            Once a supervisor shows interest, the proposal becomes locked.
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Dashboard" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-warning">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
